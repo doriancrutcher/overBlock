@@ -12,7 +12,7 @@ import EnterInfo from './Components/EnterInfo'
 import MyChallenges from './Components/MyChallenges'
 import TokenManager from './Components/TokenManager'
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Switch,
   Route,
   Link
