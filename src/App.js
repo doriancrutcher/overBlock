@@ -36,6 +36,9 @@ const {
   },
 } = nearApiJs
 
+let escrowAccount='dev-1610478176537-9279284'
+
+
 
 const useContractFullAccessKey = async () => {
   console.log(process.env.CONTRACT_PRIV_KEY)
@@ -51,11 +54,14 @@ const useContractFullAccessKey = async () => {
   })
 
   // Step 4:  get the account object of the currentAccount.  At this point, we should have full control over the account.
-  window.contaccount = new nearApiJs.Account(near.connection, 'dev-1610478176537-9279284')
+  window.contaccount = new nearApiJs.Account(near.connection, escrowAccount)
 
 }
 
 useContractFullAccessKey()
+
+
+
 
 
 

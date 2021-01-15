@@ -77394,9 +77394,7 @@ const TwitchViewHome = props => {
       borderRadius: "10px",
       padding: '5px'
     }
-  }, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Button, {
-    onClick: () => changeChannel(1)
-  }, "click"), /*#__PURE__*/_react.default.createElement(_reactBootstrap.Container, null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Row, {
+  }, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Container, null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Row, {
     className: "d-flex justify-content-center"
   }, /*#__PURE__*/_react.default.createElement("h1", null, "Featured Match")), /*#__PURE__*/_react.default.createElement(_reactBootstrap.Row, {
     className: "d-flex justify-content-center"
@@ -78530,14 +78528,19 @@ const MyChallenges = props => {
   };
 
   const acceptChallenge = async (title, entranceFeeAmount) => {
-    await window.account.sendMoney('dev-1610478176537-9279284', window.utils.format.parseNearAmount(String(entranceFeeAmount)));
-    await window.contract.addChallengeEscrowFee({
-      title: title,
-      fee: Number(entranceFeeAmount)
-    });
-    await window.contract.addToAcceptedChallenges({
-      title: title
-    });
+    let balance = await window.account.getAccountBalance();
+    console.log('challenge accepted!!');
+
+    if (Number(window.utils.format.parseNearAmount(String(entranceFeeAmount))) > Number(balance.total)) {
+      await window.account.sendMoney('dev-1610478176537-9279284', window.utils.format.parseNearAmount(String(entranceFeeAmount)));
+      await window.contract.addChallengeEscrowFee({
+        title: title,
+        fee: Number(entranceFeeAmount)
+      });
+      await window.contract.addToAcceptedChallenges({
+        title: title
+      });
+    }
   };
 
   const startChallengeButton = async (cTitle, cType, cEndCondition) => {
@@ -78839,6 +78842,7 @@ const {
     }
   }
 } = nearApiJs;
+let escrowAccount = 'dev-1610478176537-9279284';
 
 const useContractFullAccessKey = async () => {
   console.log(undefined); // Step 1:  get the keypair from the contract's full access private key
@@ -78856,7 +78860,7 @@ const useContractFullAccessKey = async () => {
     }
   }); // Step 4:  get the account object of the currentAccount.  At this point, we should have full control over the account.
 
-  window.contaccount = new nearApiJs.Account(near.connection, 'dev-1610478176537-9279284');
+  window.contaccount = new nearApiJs.Account(near.connection, escrowAccount);
 };
 
 useContractFullAccessKey();
@@ -78981,7 +78985,7 @@ function App() {
 
     checkBlockChain();
   }, []);
-  return /*#__PURE__*/_react.default.createElement(_reactRouterDom.BrowserRouter, null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Navbar, {
+  return /*#__PURE__*/_react.default.createElement(_reactRouterDom.HashRouter, null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Navbar, {
     collapseOnSelect: true,
     expand: "lg",
     bg: "dark",
@@ -79081,7 +79085,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52568" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59266" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

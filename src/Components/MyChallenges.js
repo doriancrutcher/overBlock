@@ -120,9 +120,16 @@ const MyChallenges = props => {
     }
 
     const acceptChallenge = async (title, entranceFeeAmount) => {
+        let balance= await window.account.getAccountBalance()
+        
+        console.log('challenge accepted!!')
+
+        if(Number(window.utils.format.parseNearAmount(String(entranceFeeAmount)))>Number(balance.total)){
         await  window.account.sendMoney('dev-1610478176537-9279284',window.utils.format.parseNearAmount(String(entranceFeeAmount)))
         await  window.contract.addChallengeEscrowFee({title:title, fee:Number(entranceFeeAmount)})
         await  window.contract.addToAcceptedChallenges ({title:title})
+        }
+        
     }
 
     const startChallengeButton = async (cTitle, cType, cEndCondition) => {
