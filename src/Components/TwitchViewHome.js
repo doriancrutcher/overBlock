@@ -133,7 +133,6 @@ const TwitchViewHome = props => {
 
     return (
             <Jumbotron fluid style={{ borderRadius: "10px", padding: '5px' }}>
-                <Button onClick={()=>changeChannel(1)}>click</Button>
                 <Container>
                     <Row className="d-flex justify-content-center"><h1>Featured Match</h1></Row>
                     <Row className="d-flex justify-content-center">
