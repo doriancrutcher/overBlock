@@ -78531,7 +78531,7 @@ const MyChallenges = props => {
     let balance = await window.account.getAccountBalance();
     console.log('challenge accepted!!');
 
-    if (Number(window.utils.format.parseNearAmount(String(entranceFeeAmount))) > Number(balance.total)) {
+    if (Number(window.utils.format.parseNearAmount(String(entranceFeeAmount))) < Number(balance.total)) {
       await window.account.sendMoney('dev-1610478176537-9279284', window.utils.format.parseNearAmount(String(entranceFeeAmount)));
       await window.contract.addChallengeEscrowFee({
         title: title,
@@ -78540,6 +78540,9 @@ const MyChallenges = props => {
       await window.contract.addToAcceptedChallenges({
         title: title
       });
+    } else {
+      console.log('not enough money');
+      console.log(`entrance fee is ${window.utils.format.parseNearAmount(String(entranceFeeAmount))} but all you have is ${balance.total}`);
     }
   };
 
@@ -79085,7 +79088,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59266" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55134" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

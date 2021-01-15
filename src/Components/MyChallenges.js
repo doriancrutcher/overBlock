@@ -124,10 +124,13 @@ const MyChallenges = props => {
         
         console.log('challenge accepted!!')
 
-        if(Number(window.utils.format.parseNearAmount(String(entranceFeeAmount)))>Number(balance.total)){
+        if(Number(window.utils.format.parseNearAmount(String(entranceFeeAmount)))<Number(balance.total)){
         await  window.account.sendMoney('dev-1610478176537-9279284',window.utils.format.parseNearAmount(String(entranceFeeAmount)))
         await  window.contract.addChallengeEscrowFee({title:title, fee:Number(entranceFeeAmount)})
         await  window.contract.addToAcceptedChallenges ({title:title})
+        }else{
+            console.log('not enough money')
+            console.log(`entrance fee is ${window.utils.format.parseNearAmount(String(entranceFeeAmount))} but all you have is ${balance.total}`)
         }
         
     }
