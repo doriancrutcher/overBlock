@@ -78879,97 +78879,98 @@ function App() {
 
   const checkScore = async (title, playerArray) => {};
 
-  (0, _react.useEffect)(() => {
-    const challengeUpdate = async () => {
-      // list of owners's challenge challenges 
-      let ownersList = await window.contract.getOwnersChallenges({
-        user: window.accountId
-      }); // list of challenges the user is participating in 
+  const challengeUpdate = async () => {
+    console.log('updating challenge'); // list of owners's challenge challenges 
 
-      let participatingInChallengeList = await window.contract.getChallengeParticpantList({
-        user: window.accountId
-      }); // combine list and make the result only contain unique values 
+    let ownersList = await window.contract.getOwnersChallenges({
+      user: window.accountId
+    }); // list of challenges the user is participating in 
 
-      let combinedList = Array.from(new Set([...ownersList, ...participatingInChallengeList])); // list of active challenges 
+    let participatingInChallengeList = await window.contract.getChallengeParticpantList({
+      user: window.accountId
+    }); // combine list and make the result only contain unique values 
 
-      let activeChallenges = combinedList.filter(async x => {
-        return await window.contract.getChallengeStartStatus({
-          title: x
-        });
-      }); // list of participants in active challenges
+    let combinedList = Array.from(new Set([...ownersList, ...participatingInChallengeList])); // list of active challenges 
 
-      let listOfParticipants = activeChallenges.map(async x => {
-        return await window.contract.getParticipantList({
-          title: x
-        });
+    let activeChallenges = combinedList.filter(async x => {
+      return await window.contract.getChallengeStartStatus({
+        title: x
       });
-      let resolvedListOfParticipants;
-      await Promise.all(listOfParticipants).then(values => {
-        resolvedListOfParticipants = values;
-      }); // [title]----> [player 1, player 2 ]
+    }); // list of participants in active challenges
 
-      let listOfConcludedChallenges = combinedList.map(async (x, index) => {
-        // get challenge type 
-        let challengeDetails = await window.contract.getChallengeDetails({
+    let listOfParticipants = activeChallenges.map(async x => {
+      return await window.contract.getParticipantList({
+        title: x
+      });
+    });
+    let resolvedListOfParticipants;
+    await Promise.all(listOfParticipants).then(values => {
+      resolvedListOfParticipants = values;
+    }); // [title]----> [player 1, player 2 ]
+
+    let listOfConcludedChallenges = combinedList.map(async (x, index) => {
+      // get challenge type 
+      let challengeDetails = await window.contract.getChallengeDetails({
+        title: x
+      });
+      let challengeType = challengeDetails[0]; // get list of players for this challenge
+
+      let playerList = resolvedListOfParticipants[index]; // get list of current scores from this player list
+
+      let currentScores = await playerList.map(async x => {
+        // create an array of current scores 
+        let currentScoresList; // get battletag for this player
+
+        let battleTag = await window.contract.getBattleTag({
+          name: x
+        });
+        await fetch(`https://ovrstat.com/stats/pc/${battleTag}`).then(res => {
+          if (res.status !== 200) {
+            alert('something is wrong with the battle tag' + battleTag);
+          }
+
+          ;
+          return res.json();
+        }).then(res => {
+          currentScoresList = res.quickPlayStats.careerStats.allHeroes.combat[challengeType];
+        });
+        return currentScoresList;
+      });
+      let resolvedCurrentScores;
+      await Promise.all(currentScores).then(value => resolvedCurrentScores = value); // get list of final scores 
+
+      let finalScores = await window.contract.getArrayOfFinalScores({
+        title: x
+      }); // compare final scores to current scores and make true or false array from this 
+
+      let resultsArray = finalScores.map((x, Findex) => {
+        return x <= resolvedCurrentScores[Findex];
+      });
+
+      if (resultsArray.includes(true)) {
+        let winnerNames = resolvedListOfParticipants[index].filter((x, Rindex) => resultsArray[Rindex]);
+        let prize = await window.contract.getEntranceFeeAmount({
           title: x
         });
-        let challengeType = challengeDetails[0]; // get list of players for this challenge
-
-        let playerList = resolvedListOfParticipants[index]; // get list of current scores from this player list
-
-        let currentScores = await playerList.map(async x => {
-          // create an array of current scores 
-          let currentScoresList; // get battletag for this player
-
-          let battleTag = await window.contract.getBattleTag({
-            name: x
-          });
-          await fetch(`https://ovrstat.com/stats/pc/${battleTag}`).then(res => {
-            if (res.status !== 200) {
-              alert('something is wrong with the battle tag' + battleTag);
-            }
-
-            ;
-            return res.json();
-          }).then(res => {
-            currentScoresList = res.quickPlayStats.careerStats.allHeroes.combat[challengeType];
-          });
-          return currentScoresList;
+        let distributedPrize = prize / winnerNames.length;
+        winnerNames.forEach(async x => {
+          window.contaccount.sendMoney(x, distributedPrize);
         });
-        let resolvedCurrentScores;
-        await Promise.all(currentScores).then(value => resolvedCurrentScores = value); // get list of final scores 
-
-        let finalScores = await window.contract.getArrayOfFinalScores({
+        await window.contract.endChallengeStartStatus({
           title: x
-        }); // compare final scores to current scores and make true or false array from this 
-
-        let resultsArray = finalScores.map((x, Findex) => {
-          return x <= resolvedCurrentScores[Findex];
         });
+        await window.contract.addToWinners({
+          title: x,
+          users: winnerNames
+        });
+      }
+    }); // [ player 1] ----> (requiredEndScore>CurrentScore)-----> returns (true or false)
+    // returns array [true,false]
+    // if array includes true conclude competition
+    // comparison for challenge winners 
+  };
 
-        if (resultsArray.includes(true)) {
-          let winnerNames = resolvedListOfParticipants[index].filter((x, Rindex) => resultsArray[Rindex]);
-          let prize = await window.contract.getEntranceFeeAmount({
-            title: x
-          });
-          let distributedPrize = prize / winnerNames.length;
-          winnerNames.forEach(async x => {
-            window.contaccount.sendMoney(x, distributedPrize);
-          });
-          await window.contract.endChallengeStartStatus({
-            title: x
-          });
-          await window.contract.addToWinners({
-            title: x,
-            users: winnerNames
-          });
-        }
-      }); // [ player 1] ----> (requiredEndScore>CurrentScore)-----> returns (true or false)
-      // returns array [true,false]
-      // if array includes true conclude competition
-      // comparison for challenge winners 
-    };
-
+  (0, _react.useEffect)(() => {
     challengeUpdate();
   }, []);
   (0, _react.useEffect)(() => {
@@ -78987,6 +78988,10 @@ function App() {
     };
 
     checkBlockChain();
+  }, []);
+  (0, _react.useEffect)(() => {
+    const interval = setInterval(challengeUpdate, 3000);
+    return () => clearInterval(interval);
   }, []);
   return /*#__PURE__*/_react.default.createElement(_reactRouterDom.HashRouter, null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Navbar, {
     collapseOnSelect: true,
@@ -79088,7 +79093,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55134" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57516" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
