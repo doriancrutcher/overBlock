@@ -1,5 +1,5 @@
 
-import { Context, logging, PersistentMap, storage } from 'near-sdk-as'
+import { Context, logging, persist, PersistentMap, storage } from 'near-sdk-as'
 
 
 // Step 1 Get Battle Tags and twitch handles 
@@ -14,6 +14,7 @@ let challengeBattleTags= new PersistentMap<string,string[]>("battle tags involve
 let allChallenges= new PersistentMap<string,string[]>("recent challenges for home page feature ")
 let challengeStartStatus=new PersistentMap<string,bool>('Start status ')
 let finalScoreArray=new PersistentMap<string,i32[]>("final score Array ")
+let startingScores=new PersistentMap<string,i32[]>("Starting Score Array")
 
 
 // who owns the chagllenge?
@@ -42,32 +43,29 @@ let allChallengesKey= 'recentChallenge'
 
 //  ----------------------------------------------------Step 1 Get Battle Tags and Twitch Handles ------------------------------------------------// 
 
-export function changeBattleTag(name:string,battleTag:string):void{
-  logging.log('changing battle tag')
-  BattleTags.set(name, battleTag)
-
+export function sayHi():string{
+  return 'hi'
 }
-
 
 export function addBattleTag(name:string,battleTag:string):void{
   if (battleTag.includes("#")) {
-    let splitName = battleTag.split("#")
-    let reformattedName = splitName[0] + "-" + splitName[1]
-    logging.log('reformatting name to:')
-    logging.log(reformattedName)
-    BattleTags.set(name, reformattedName)
+    let splitName = battleTag.split("#");
+    let reformattedName = splitName[0] + "-" + splitName[1];
+    logging.log('reformatting name to:');
+    logging.log(reformattedName);
+    BattleTags.set(name, reformattedName);
   }
   else if (battleTag.includes('-')){
-    logging.log('totally adding this')
-    BattleTags.set(name, battleTag)
+    logging.log('totally adding this');
+    BattleTags.set(name, battleTag);
   }else{
-    logging.log('invalid battletag')
+    logging.log('invalid battletag');
   }
 }
 
 export function getBattleTag(name: string): string {
   if (BattleTags.contains(name)) {
-    return BattleTags.getSome(name)
+    return BattleTags.getSome(name);
   } else {
     return ""
   }
@@ -75,23 +73,23 @@ export function getBattleTag(name: string): string {
 
 export function checkBattleTag(name: string): boolean {
   if (BattleTags.contains(name)) {
-    logging.log('BattleTag Exists!')
+    logging.log('BattleTag Exists!');
     return true
   }
   else {
-    logging.log('Battle Tag Does Not Exist!')
+    logging.log('Battle Tag Does Not Exist!');
     return false
   }
 }
 
 export function setTwitch(TwitchHandle: string): void {
-  TwitchHandles.set(Context.sender, TwitchHandle)
-  logging.log(`Twitch handle for ${Context.sender} set to ${TwitchHandle}`)
+  TwitchHandles.set(Context.sender, TwitchHandle);
+  logging.log(`Twitch handle for ${Context.sender} set to ${TwitchHandle}`);
 }
 
 export function getTwitchHandle(name: string): string {
   if (TwitchHandles.contains(name)) {
-    return TwitchHandles.getSome(name)
+    return TwitchHandles.getSome(name);
   } else {
     return ""
   }
@@ -201,6 +199,8 @@ export function addToAcceptedChallenges ( title:string):void{
     participantsAccepted.set(title,[Context.sender])
   }
 }
+
+
 
 export function getAcceptedChallengesList (title:string):string[]{
   if(participantsAccepted.contains(title)){
@@ -322,6 +322,7 @@ export function getTokenBalance(user:string):i32{
   }
 }
 
+
 // ---------------------------------------- winners managment ----------------------------// 
 export function addToWinners(title:string, users:string[]):void{
   if(challengeWinners.contains(title)){
@@ -417,13 +418,35 @@ export function addToConcludedChallenges(title:string):void{
   else{
     if(concludedChallenges.contains('finished')){
     let currList=concludedChallenges.getSome('finished')
-    concludedChallenges.set('finished',[...currList,title])
+    currList.push(title)
+    concludedChallenges.set('finished',currList)
     }else{
       concludedChallenges.set('finished',[title])
     }
   }
 }
+export function test():string{
+  return 'pashmais'
+}
 
 export function getConcludedChallenges():string[]{
+  if(concludedChallenges.contains('finished')){
   return concludedChallenges.getSome('finished')
+  }else{
+    return []
+  }
+}
+
+
+export function setStartScores(title:string,startScores:i32[]):void{
+  logging.log('setting start scores')
+  startingScores.set(title,startScores)
+}
+
+export function getStartScores(title:string):i32[]{
+  if(startingScores.contains(title)){
+   return startingScores.getSome(title)
+}else{
+  return []
+}
 }

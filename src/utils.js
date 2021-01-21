@@ -45,12 +45,13 @@ export async function initContract() {
     'getChallengeParticpantList',
     'getChallengeBal',
     'subChallengeEscrowFee',
-    'getTokenBalance',
-  'getWinner','getAllChallenges','getChallengeLength','getEntranceFeeAmount','getChallengeStartStatus','getOwnersChallenges','getArrayOfFinalScores'
+    'getTokenBalance','test',
+  'getWinner','getStartScores','getAllChallenges','getChallengeLength','getEntranceFeeAmount','getChallengeStartStatus','getOwnersChallenges','getArrayOfFinalScores'
 ],
         // Change methods can modify the state. But you don't receive the returned value when called.
-
-    changeMethods: ['addToConcludedChallenges','addBattleTag',
+       
+        
+    changeMethods: [ 'setStartScores','addToConcludedChallenges','addBattleTag',
     'setTwitch',
     'addChallengeDetails',
     'addChallengeParticipants',
@@ -58,8 +59,13 @@ export async function initContract() {
     'addChallengeToParticipantsList',
     'addChallengeEscrowFee',
     'addTokenBalance',
-  ,'addToWinners','addToChallengeList','recordChallengeEntranceFeeAmount','beginChallengeStartStatus','endChallengeStartStatus','addArrayOfFinalScores',
-  'deleteOwnerChannelAll','changeBattleTag'
+  ,'addToWinners','addToChallengeList',
+  'recordChallengeEntranceFeeAmount',
+  'beginChallengeStartStatus',
+  'endChallengeStartStatus',
+  'addArrayOfFinalScores',
+  'deleteOwnerChannelAll',
+  'sayHi'
 ],
 
   })

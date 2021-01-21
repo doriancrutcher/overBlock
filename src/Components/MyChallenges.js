@@ -23,6 +23,9 @@ const MyChallenges = props => {
     const [ownerType, changeOwnerType] = useState([])
     const [ownerPrize, changeOwnerPrize] = useState([])
     const [numberOfParticipants, changeNumberOfParticipants] = useState([]);
+    const [challengeAcceptReject,changeAcceptReject]=useState(false)
+    const [challengeBeginReject,changeBeginReject]=useState(false)
+
 
 
     useEffect(() => {
@@ -115,11 +118,13 @@ const MyChallenges = props => {
     }, [])
 
     const deleteChallenge = async (challengetitle) => {
+        changeBeginReject(true)
         await window.contract.deleteOwnerChannelAll({title:challengetitle });
 
     }
 
     const acceptChallenge = async (title, entranceFeeAmount) => {
+        changeAcceptReject(true)
         let balance= await window.account.getAccountBalance()
         
         console.log('challenge accepted!!')
@@ -129,6 +134,7 @@ const MyChallenges = props => {
         await  window.contract.addChallengeEscrowFee({title:title, fee:Number(entranceFeeAmount)})
         await  window.contract.addToAcceptedChallenges ({title:title})
         }else{
+            changeAcceptReject(false)
             console.log('not enough money')
             console.log(`entrance fee is ${window.utils.format.parseNearAmount(String(entranceFeeAmount))} but all you have is ${balance.total}`)
         }
@@ -136,6 +142,7 @@ const MyChallenges = props => {
     }
 
     const startChallengeButton = async (cTitle, cType, cEndCondition) => {
+        changeBeginReject(true)
         console.log(cType)
         //export function startChallenge(title:string,endCondition:i32,startStatus:i32[],participants:string[]):void{
         // step one get the initial values for the type of challenge
@@ -161,7 +168,10 @@ const MyChallenges = props => {
                 .then(res => {if(res.status!==200){alert('something is wrong with the battle tag'+battleTag)}; return res.json()})
                 .then(res => {
                     startScore = res.quickPlayStats.careerStats.allHeroes.combat[cType]
+                    console.log(startScore)
                     finalScores.push(res.quickPlayStats.careerStats.allHeroes.combat[cType]+Number(cEndCondition))
+                    startingScore.push(Number(startScore))
+                   
                 }
                 )
 
@@ -176,6 +186,8 @@ const MyChallenges = props => {
         console.log(finalScores)
         await window.contract.addArrayOfFinalScores({title:cTitle,arrayOfScores:finalScores})
         console.log('challenge Started')
+        console.log(startingScore)
+        await window.contract.setStartScores({title:cTitle,startScores:startingScore})
     }
 
     return (
@@ -215,10 +227,10 @@ const MyChallenges = props => {
                                         (getStatusList) ?
                                             ((!acceptedChallenges[index]) ? (
                                                 
-                                                <React.Fragment className="d-flex justify-content-center">
+                                                <React.Fragment >
                                                     
-                                                    <Button onClick={() => acceptChallenge(x, challengeFees[index])} variant="primary">Enter!</Button>
-                                                    <Button onClick={async () => { window.contract.removeFromChallengerList({ title:x }) }} variant="danger">Reject</Button></React.Fragment>) 
+                                                    <Button disabled={challengeAcceptReject} onClick={() => acceptChallenge(x, challengeFees[index])} variant="primary">Enter!</Button>
+                                                    <Button disabled={challengeAcceptReject} onClick={async () => { window.contract.removeFromChallengerList({ title:x }) }} variant="danger">Reject</Button></React.Fragment>) 
                                                     : 'Challenge Accepted! Entrance Fee Sent')
                                             : 'Challenge Started'
                                     }

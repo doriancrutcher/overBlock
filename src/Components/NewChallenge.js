@@ -30,6 +30,7 @@ const NewChallenge = props => {
   const [gameSetting, changeGameSetting] = useState('Kill')
   const [challengeTitle, changeChallengeTitle] = useState('')
   const [submitStatus, changeSubmitStatus] = useState(false)
+  const [loadingStatus,changeLoadingStatus]=useState('spp')
 
 
  
@@ -88,7 +89,7 @@ const NewChallenge = props => {
   }
 
   const sendToBlockChain = async () => {
-
+    
     changeSubmitStatus(true)
     console.log('sending to blockchain')
     let getParticipants = participantRef.current.value
@@ -96,13 +97,21 @@ const NewChallenge = props => {
     let removeSpaces = [];
     let titleName = await createUniqueTitleName()
 
+    let challengeTitleInfo=challengeTitleRef.current.value
+    let entranceFeeInfo=entranceFeeRef.current.value
+    let pointRefInfo=pointRef.current.value
+    let challengeType = challengeRef.current.value
+
+
+    changeLoadingStatus('loading')
 
 
   // this section ensures that all the information needed has been entered and will halt the progress of the rest of the function until the necessary information 
   // has been provided 
-      if (challengeTitleRef.current.value === '') { changeSubmitStatus(false); return alert('Enter a Title you Jerk') }
-  if (entranceFeeRef.current.value === '' || entranceFeeRef.current.value.match(/[a-zA-Z]/g) !== null) { changeSubmitStatus(false); return alert('Is anything ever truly free? Please enter some sort of entrance fee for this challenge') }
-  if (pointRef.current.value === '' || pointRef.current.value.match(/[a-zA-Z]/g) !== null) { changeSubmitStatus(false); return alert('Sometimes things must end. Please enter the end condition') }
+  console.log(challengeTitleRef)
+      if (challengeTitleInfo === '') { changeSubmitStatus(false); changeLoadingStatus('app');return alert('Enter a Title you Jerk') }
+  if (entranceFeeInfo === '' || entranceFeeInfo.match(/[a-zA-Z]/g) !== null) { changeLoadingStatus('app');changeSubmitStatus(false); return alert('Is anything ever truly free? Please enter some sort of entrance fee for this challenge') }
+  if (pointRefInfo === '' || pointRefInfo.match(/[a-zA-Z]/g) !== null) { changeLoadingStatus('app');changeSubmitStatus(false); return alert('Sometimes things must end. Please enter the end condition') }
 
 
   // this removes spaces and checks if the account names entered are in the correct format 
@@ -124,9 +133,8 @@ const NewChallenge = props => {
     console.log('this ran!')
     // collection area
 
-    let challengeType = challengeRef.current.value
-    let challengeEndCondition = pointRef.current.value
-    let challengeEntranceFee = entranceFeeRef.current.value
+    let challengeEndCondition = pointRefInfo
+    let challengeEntranceFee = entranceFeeInfo
 
     console.log(`Title ${titleName} type:${challengeType} end condition:${challengeEndCondition} the Entrance Fee:${challengeEntranceFee} `)
     console.log(`adding Challenge details to block chain title ${titleName} and the end condition is ${challengeEndCondition}`)
@@ -141,12 +149,13 @@ const NewChallenge = props => {
     }
  
     alert('challenge uploaded go check it out in the challenge manager')
+    changeLoadingStatus('uploaded')
 
 }
 
   // if (challengeTitleRef.current.value === '') { changeSubmitStatus(false); return alert('Enter a Title you Jerk') }
-  // if (entranceFeeRef.current.value === '' || entranceFeeRef.current.value.match(/[a-zA-Z]/g) !== null) { changeSubmitStatus(false); return alert('Is anything ever truly free? Please enter some sort of entrance fee for this challenge') }
-  // if (pointRef.current.value === '' || pointRef.current.value.match(/[a-zA-Z]/g) !== null) { changeSubmitStatus(false); return alert('Sometimes things must end. Please enter the end condition') }
+  // if (entranceFeeInfo === '' || entranceFeeInfo.match(/[a-zA-Z]/g) !== null) { changeSubmitStatus(false); return alert('Is anything ever truly free? Please enter some sort of entrance fee for this challenge') }
+  // if (pointRefInfo === '' || pointRefInfo.match(/[a-zA-Z]/g) !== null) { changeSubmitStatus(false); return alert('Sometimes things must end. Please enter the end condition') }
 
   // if (getParticipants !== '') {
   //   makeParticipantArray.forEach(x => {
@@ -162,46 +171,64 @@ const NewChallenge = props => {
   //   return 
 
 
+  let loadingView=<Container>
+    <Row style={{color:'white'}}>Sit Tight</Row>
+  </Container>
+
+  let newChallengeView=<Container>
+    
+  <Row style={{ color: 'white', marginTop: '10px' }} className='d-flex justify-content-center'><h1>Create Your Challenge</h1></Row>
+  <Row style={{ marginTop: '10px' }} className='d-flex justify-content-center'>
+    <Form style={{ boarderRadius: '10px', width: '80vw', padding: '10px', backgroundColor: 'rgb(50,50,50)', color: 'white' }}>
+      <Form.Group controlId="exampleForm.ControlInput1">
+        <Form.Label>Challenge Title</Form.Label>
+        <Form.Control ref={challengeTitleRef} placeholder="Enter Challenge Title Here..." />
+      </Form.Group>
+      <Form.Group controlId="exampleForm.ControlSelect1">
+        <Form.Label>Public Or Private?</Form.Label>
+        <Form.Control onChange={() => { (publicOrPrivate === 'Public') ? changeToPublicOrPrivate('Private') : changeToPublicOrPrivate('Public') }} as="select">
+          <option>Private</option>
+          <option>Public</option>
+        </Form.Control>
+      </Form.Group>
+
+      <Form.Group controlId="exampleForm.ControlSelect1">
+        <Form.Label>Challenge Type</Form.Label>
+        <Form.Control ref={challengeRef} onChange={() => changeGameSetting(challengeRef.current.value)} as="select">
+          <option>Solo Kills</option>
+          <option>Victories</option>
+          <option>Medals</option>
+          <option>eliminations</option>
+        </Form.Control>
+      </Form.Group>
 
 
-
-
-
-
-
-
-
-  return (
-    <Container>
-      <Row style={{ color: 'white', marginTop: '10px' }} className='d-flex justify-content-center'><h1>Create Your Challenge</h1></Row>
-      <Row style={{ marginTop: '10px' }} className='d-flex justify-content-center'>
-        <Form style={{ boarderRadius: '10px', width: '80vw', padding: '10px', backgroundColor: 'rgb(50,50,50)', color: 'white' }}>
-          <Form.Group controlId="exampleForm.ControlInput1">
-            <Form.Label>Challenge Title</Form.Label>
-            <Form.Control ref={challengeTitleRef} placeholder="Enter Challenge Title Here..." />
-          </Form.Group>
-          <Form.Group controlId="exampleForm.ControlSelect1">
-            <Form.Label>Public Or Private?</Form.Label>
-            <Form.Control onChange={() => { (publicOrPrivate === 'Public') ? changeToPublicOrPrivate('Private') : changeToPublicOrPrivate('Public') }} as="select">
-              <option>Private</option>
-              <option>Public</option>
+      {(gameSetting === "Kill") ?
+        <Form.Group>
+          <Form.Label>Kills to Win</Form.Label>
+          <Form.Control
+            onChange={() => {
+              changeDateValue(pointRef.current.value)
+            }}
+            ref={pointRef}
+            type="text"
+            placeholder='Enter Value'>
+          </Form.Control>
+        </Form.Group>
+        : (gameSetting === "Victories") ?
+          <Form.Group>
+            <Form.Label>Victories to Win</Form.Label>
+            <Form.Control
+              onChange={() => {
+                changeDateValue(pointRef.current.value)
+              }}
+              ref={pointRef}
+              type="text"
+              placeholder='Enter Value'>
             </Form.Control>
-          </Form.Group>
-
-          <Form.Group controlId="exampleForm.ControlSelect1">
-            <Form.Label>Challenge Type</Form.Label>
-            <Form.Control ref={challengeRef} onChange={() => changeGameSetting(challengeRef.current.value)} as="select">
-              <option>Solo Kills</option>
-              <option>Victories</option>
-              <option>Medals</option>
-              <option>eliminations</option>
-            </Form.Control>
-          </Form.Group>
-
-
-          {(gameSetting === "Kill") ?
+          </Form.Group> : (gameSetting === "Medals") ?
             <Form.Group>
-              <Form.Label>Kills to Win</Form.Label>
+              <Form.Label>Medals to Win</Form.Label>
               <Form.Control
                 onChange={() => {
                   changeDateValue(pointRef.current.value)
@@ -210,10 +237,9 @@ const NewChallenge = props => {
                 type="text"
                 placeholder='Enter Value'>
               </Form.Control>
-            </Form.Group>
-            : (gameSetting === "Victories") ?
+            </Form.Group> : (gameSetting === "eliminations") ?
               <Form.Group>
-                <Form.Label>Victories to Win</Form.Label>
+                <Form.Label>Eliminations to Win</Form.Label>
                 <Form.Control
                   onChange={() => {
                     changeDateValue(pointRef.current.value)
@@ -222,95 +248,112 @@ const NewChallenge = props => {
                   type="text"
                   placeholder='Enter Value'>
                 </Form.Control>
-              </Form.Group> : (gameSetting === "Medals") ?
-                <Form.Group>
-                  <Form.Label>Medals to Win</Form.Label>
-                  <Form.Control
-                    onChange={() => {
-                      changeDateValue(pointRef.current.value)
-                    }}
-                    ref={pointRef}
-                    type="text"
-                    placeholder='Enter Value'>
-                  </Form.Control>
-                </Form.Group> : (gameSetting === "eliminations") ?
-                  <Form.Group>
-                    <Form.Label>Eliminations to Win</Form.Label>
-                    <Form.Control
-                      onChange={() => {
-                        changeDateValue(pointRef.current.value)
-                      }}
-                      ref={pointRef}
-                      type="text"
-                      placeholder='Enter Value'>
-                    </Form.Control>
-                  </Form.Group> : null
-          }
+              </Form.Group> : null
+      }
 
 
-          <Form.Group>
-            <Form.Label>What is the entrance fee for this challenge?</Form.Label>
-            <InputGroup className="mb-2 mr-sm-2">
-              <InputGroup.Prepend>
-                <InputGroup.Text>NEAR</InputGroup.Text>
-              </InputGroup.Prepend>
-              <FormControl ref={entranceFeeRef} id="entrance fee" placeholder="enter NEAR amount" />
-            </InputGroup>
-          </Form.Group>
+      <Form.Group>
+        <Form.Label>What is the entrance fee for this challenge?</Form.Label>
+        <InputGroup className="mb-2 mr-sm-2">
+          <InputGroup.Prepend>
+            <InputGroup.Text>NEAR</InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl ref={entranceFeeRef} id="entrance fee" placeholder="enter NEAR amount" />
+        </InputGroup>
+      </Form.Group>
 
-          <Form.Group controlId="exampleForm.ControlSelect1">
-            <Form.Label>Hero Specific or Not?</Form.Label>
-            <Form.Control onChange={() => { (heroSpecific !== 'Any Hero') ? changeHeroSpecific('Any Hero') : changeHeroSpecific('Specific Hero') }} as="select">
-              <option>Any Hero</option>
-              <option>Specific Hero</option>
+      <Form.Group controlId="exampleForm.ControlSelect1">
+        <Form.Label>Hero Specific or Not?</Form.Label>
+        <Form.Control onChange={() => { (heroSpecific !== 'Any Hero') ? changeHeroSpecific('Any Hero') : changeHeroSpecific('Specific Hero') }} as="select">
+          <option>Any Hero</option>
+          <option>Specific Hero</option>
+        </Form.Control>
+      </Form.Group>
+
+      {(heroSpecific === 'Specific Hero') ?
+        <Form.Group>
+          <Form.Label>Choose your Hero</Form.Label>
+          <Form.Control onChange={() => { console.log(heroRef.current.value) }} ref={heroRef} as="select">
+            {overwatchHeroes.map((x) => {
+              return (<option>{x}</option>)
+            })}
+          </Form.Control>
+        </Form.Group> : null
+      }
+      {
+        (publicOrPrivate === 'Private') ?
+          <Form.Group controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Enter Player Near Account Names Separated by Commas (example: blockheads.testnet,underdog3000.testnet)</Form.Label>
+            <Form.Control ref={participantRef} as="textarea" rows={3} />
+          </Form.Group> : <Form.Group controlId="Challenge Start Date">
+            <Form.Label>What day would you like your challenge to begin?</Form.Label>
+            <Form.Control
+              onChange={() => {
+                changeDateValue(dateRef.current.value)
+              }}
+              ref={dateRef}
+              type="text"
+              placeholder='enter date dd/mm/yyyy ex 03/12/2020'>
+            </Form.Control>
+            <Form.Label>What time would you like your challenge to begin?</Form.Label>
+            <Form.Control
+              as="select"
+              placeholder='enter time dd/mm/yyyy'>
+              {
+                (dateValue === currentDate) ? availiableHours.map((x) => { return (<option>{x}</option>) }) : allHours.map((x) => { return (<option>{x}</option>) })
+              }
             </Form.Control>
           </Form.Group>
 
-          {(heroSpecific === 'Specific Hero') ?
-            <Form.Group>
-              <Form.Label>Choose your Hero</Form.Label>
-              <Form.Control onChange={() => { console.log(heroRef.current.value) }} ref={heroRef} as="select">
-                {overwatchHeroes.map((x) => {
-                  return (<option>{x}</option>)
-                })}
-              </Form.Control>
-            </Form.Group> : null
-          }
-          {
-            (publicOrPrivate === 'Private') ?
-              <Form.Group controlId="exampleForm.ControlTextarea1">
-                <Form.Label>Enter Player Near Account Names Separated by Commas (example: blockheads.testnet,underdog3000.testnet)</Form.Label>
-                <Form.Control ref={participantRef} as="textarea" rows={3} />
-              </Form.Group> : <Form.Group controlId="Challenge Start Date">
-                <Form.Label>What day would you like your challenge to begin?</Form.Label>
-                <Form.Control
-                  onChange={() => {
-                    changeDateValue(dateRef.current.value)
-                  }}
-                  ref={dateRef}
-                  type="text"
-                  placeholder='enter date dd/mm/yyyy ex 03/12/2020'>
-                </Form.Control>
-                <Form.Label>What time would you like your challenge to begin?</Form.Label>
-                <Form.Control
-                  as="select"
-                  placeholder='enter time dd/mm/yyyy'>
-                  {
-                    (dateValue === currentDate) ? availiableHours.map((x) => { return (<option>{x}</option>) }) : allHours.map((x) => { return (<option>{x}</option>) })
-                  }
-                </Form.Control>
-              </Form.Group>
+
+      }
+      <Container>
+        <Row className="d-flex justify-content-center">
+          <Button disabled={submitStatus} onClick={() => { sendToBlockChain() }}>Submit</Button>
+        </Row>
+      </Container>
+    </Form>
+  </Row>
+</Container>
+
+  let uploaded=<Container>
+    <Row className={'d-flex justify-content-center'} style={{color:'white'}}>
+      <h1> Go To App Manager</h1>
+    </Row>
+  </Container>
+  const displayOutput=(status)=>{
+    switch(status){
+      case 'loading':
+        return loadingView
+        break;
+      
+      case 'app':
+        return newChallengeView
+
+      case 'uploaded':
+      return uploaded
+
+      default:
+        return newChallengeView
+    }
+  }
 
 
-          }
-          <Container>
-            <Row className="d-flex justify-content-center">
-              <Button disabled={submitStatus} onClick={() => { sendToBlockChain() }}>Submit</Button>
-            </Row>
-          </Container>
-        </Form>
-      </Row>
-    </Container>
+
+
+
+
+
+
+
+  return (<React.Fragment>
+
+
+    {displayOutput(loadingStatus)}
+    
+    
+        
+        </React.Fragment>
 
 
   );
