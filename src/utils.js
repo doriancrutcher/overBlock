@@ -59,7 +59,7 @@ export async function initContract() {
     'addChallengeEscrowFee',
     'addTokenBalance',
   ,'addToWinners','addToChallengeList','recordChallengeEntranceFeeAmount','beginChallengeStartStatus','endChallengeStartStatus','addArrayOfFinalScores',
-  'deleteOwnerChannelAll'
+  'deleteOwnerChannelAll','changeBattleTag'
 ],
 
   })

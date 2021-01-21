@@ -42,17 +42,24 @@ let allChallengesKey= 'recentChallenge'
 
 //  ----------------------------------------------------Step 1 Get Battle Tags and Twitch Handles ------------------------------------------------// 
 
+export function changeBattleTag(name:string,battleTag:string):void{
+  logging.log('changing battle tag')
+  BattleTags.set(name, battleTag)
+
+}
+
+
 export function addBattleTag(name:string,battleTag:string):void{
   if (battleTag.includes("#")) {
     let splitName = battleTag.split("#")
     let reformattedName = splitName[0] + "-" + splitName[1]
     logging.log('reformatting name to:')
     logging.log(reformattedName)
-    BattleTags.set(Context.sender, reformattedName)
+    BattleTags.set(name, reformattedName)
   }
   else if (battleTag.includes('-')){
-    logging.log('setting battle tag')
-    BattleTags.set(Context.sender, battleTag)
+    logging.log('totally adding this')
+    BattleTags.set(name, battleTag)
   }else{
     logging.log('invalid battletag')
   }
