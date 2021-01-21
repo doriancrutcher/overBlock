@@ -11,6 +11,8 @@ import NewChallenge from './Components/NewChallenge'
 import EnterInfo from './Components/EnterInfo'
 import MyChallenges from './Components/MyChallenges'
 import TokenManager from './Components/TokenManager'
+import overstat from 'overstat'
+
 import {
   HashRouter as Router,
   Switch,
@@ -36,9 +38,20 @@ const {
   },
 } = nearApiJs
 
+
 let escrowAccount='dev-1610478176537-9279284'
-
-
+const options = {
+  method: 'GET',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json;charset=UTF-8'
+  }
+};
+fetch('https://ovrstat.com/stats/pc/chadlamon-1426')
+          .then(res => {
+            console.log(res.json())
+          }
+          )
 
 const useContractFullAccessKey = async () => {
   console.log(process.env.CONTRACT_PRIV_KEY)
@@ -122,9 +135,12 @@ export default function App() {
         let currentScoresList
         // get battletag for this player
         let battleTag = await window.contract.getBattleTag({ name: x })
+        console.log(battleTag)
+        console.log(challengeType)
         await fetch(`https://ovrstat.com/stats/pc/${battleTag}`)
           .then(res => { if (res.status !== 200) { alert('something is wrong with the battle tag' + battleTag) }; return res.json() })
           .then(res => {
+            console.log(res.quickPlayStats.careerStats.allHeroes.combat)
             currentScoresList = res.quickPlayStats.careerStats.allHeroes.combat[challengeType]
           }
           )
@@ -189,7 +205,7 @@ export default function App() {
   }, [])
 
 useEffect(()=>{
-const interval=setInterval(challengeUpdate, 3000);
+const interval=setInterval(challengeUpdate, 300000);
 return() => clearInterval(interval)
   
 },[])

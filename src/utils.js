@@ -1,4 +1,5 @@
 import { Account, connect, Contract, keyStores, WalletConnection,utils} from 'near-api-js'
+import { async } from 'regenerator-runtime'
 import getConfig from './config'
 
 const nearConfig = getConfig(process.env.NODE_ENV || 'development')
@@ -18,6 +19,18 @@ export async function initContract() {
   window.account=new Account(near.connection,window.accountId)
 
   window.utils=utils
+
+  window.testBattleTag=async(name,challengeType)=>{
+      let battleTag=await window.contract.getBattleTag({name:name})
+      battleTag
+      await fetch(`https://ovrstat.com/stats/pc/${battleTag}`)
+      .then(res => { if (res.status !== 200) { alert('something is wrong with the battle tag' + battleTag) }; return res.json() })
+      .then(res => {
+        console.log(res.quickPlayStats.careerStats.allHeroes.combat)
+        currentScoresList = res.quickPlayStats.careerStats.allHeroes.combat[challengeType]
+      }
+      )
+  }
 
   // Initializing our contract APIs by contract name and configuration
   window.contract = await new Contract(window.walletConnection.account(), nearConfig.contractName, {
