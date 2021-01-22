@@ -67,7 +67,6 @@ const useContractFullAccessKey = async () => {
   })
 
   // Step 4:  get the account object of the currentAccount.  At this point, we should have full control over the account.
-  window.contaccount = new nearApiJs.Account(near.connection, escrowAccount)
    contaccount = new nearApiJs.Account(near.connection, escrowAccount)
 
 }
