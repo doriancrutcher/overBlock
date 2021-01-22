@@ -52,7 +52,7 @@ fetch('https://ovrstat.com/stats/pc/chadlamon-1426')
             console.log(res.json())
           }
           )
-
+let contaccount
 const useContractFullAccessKey = async () => {
   console.log(process.env.CONTRACT_PRIV_KEY)
   // Step 1:  get the keypair from the contract's full access private key
@@ -68,7 +68,7 @@ const useContractFullAccessKey = async () => {
 
   // Step 4:  get the account object of the currentAccount.  At this point, we should have full control over the account.
   window.contaccount = new nearApiJs.Account(near.connection, escrowAccount)
-  let contaccount = new nearApiJs.Account(near.connection, escrowAccount)
+   contaccount = new nearApiJs.Account(near.connection, escrowAccount)
 
 }
 
