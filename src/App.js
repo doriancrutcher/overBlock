@@ -68,6 +68,7 @@ const useContractFullAccessKey = async () => {
 
   // Step 4:  get the account object of the currentAccount.  At this point, we should have full control over the account.
   window.contaccount = new nearApiJs.Account(near.connection, escrowAccount)
+  let contaccount = new nearApiJs.Account(near.connection, escrowAccount)
 
 }
 
@@ -163,7 +164,7 @@ export default function App() {
         let prize = await window.contract.getEntranceFeeAmount({ title: x })
         let distributedPrize = prize / winnerNames.length
         winnerNames.forEach(async (x) => {
-          window.contaccount.sendMoney(x, distributedPrize)
+          contaccount.sendMoney(x, distributedPrize)
         })
 
         await window.contract.endChallengeStartStatus({ title: x })
