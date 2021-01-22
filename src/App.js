@@ -168,6 +168,7 @@ export default function App() {
 
         await window.contract.endChallengeStartStatus({ title: x })
         await window.contract.addToWinners({ title: x, users: winnerNames })
+        console.log(contaccount)
 
       }
 
